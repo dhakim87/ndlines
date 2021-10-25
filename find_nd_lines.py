@@ -132,13 +132,12 @@ def find_nd_lines(df, genus_name, MIN_GENUS_COUNT):
             print(name)
 
     for col1_index in range(len(filtered_df.columns)-1):
-        pass
-        # plot_scatter(
-        #     filtered_df, simplex_df,
-        #     best_clustering,
-        #     genus_name + " Score:" + str(best_silhouette),
-        #     col1_index, col1_index+1
-        # )
+        plot_scatter(
+            filtered_df, simplex_df,
+            best_clustering,
+            genus_name + " Score:" + str(best_silhouette),
+            col1_index, col1_index+1
+        )
 
     return best_silhouette
 
