@@ -6,6 +6,15 @@ from sklearn.metrics import silhouette_score
 from matplotlib import pyplot as plt
 import numpy as np
 
+matplotlib.use('TkAgg')
+
+GOOD_ONES = ["Acetivibrio", "Acetobacter", "Acidaminococcus", "Alloprevotella", "Anaerostipes", "Azospirillum",
+             "Brachyspira", "Catenibacterium", "Cloacibacillus", "Collinsella", "Comamonas", "Coprobacillus",
+             "Coraliomargarita", "Cryptobacterium", "Desulfovibrio", "Dialister", "Enorma", "Fusobacterium",
+             "Hungatella", "Lactococcus", "Megamonas", "Megasphaera", "Methanobrevibacter", "Methanomassiliicoccus",
+             "Mycoplasma", "Oxalobacter", "Peptostreptococcus", "Phascolarctobacterium", "Pontibacillus",
+             "Pseudomonas", "Slackia", "Solobacterium", "Staphylococcus", "Succinatimonas", "Synergistes"]
+
 
 def plot_scatter(filtered_df, simplex_df, best_clustering, title, col1_index, col2_index):
     if col1_index == col2_index:
@@ -27,6 +36,10 @@ def plot_scatter(filtered_df, simplex_df, best_clustering, title, col1_index, co
             line = best_clustering.cluster_centers_[line_index]
             lx = line[col1_index]
             ly = line[col2_index]
+            if lx < 0:
+                lx = 0
+            if ly < 0:
+                ly = 0
 
             if lx == 0 and ly == 0:
                 x = 0
@@ -48,7 +61,7 @@ def plot_scatter(filtered_df, simplex_df, best_clustering, title, col1_index, co
             plt.plot([0, x], [0, y], c=cmap(line_index / (len(best_clustering.cluster_centers_)-1)))
 
     plt.axis('equal')
-    plt.title('Clustered Reads:' + title)
+    plt.title(title)
     plt.xlabel(c1)
     plt.ylabel(c2)
 
@@ -153,7 +166,11 @@ if __name__ == '__main__':
     all_genera = metadata_table['genus'].unique()
     all_genera = [str(g) for g in all_genera]
     all_genera.sort()
-    for genus in all_genera:
+
+    skip_genera = set()  # ["Bacteroides", "Clostridium"])
+    for genus in ["Akkermansia"]:
+        if genus in skip_genera:
+            continue
         genus_ids = metadata_table[metadata_table['genus'] == genus].sort_values("species")[['#genome', 'genus', 'species']]
         genus_ids = [g for g in genus_ids['#genome'] if g in woltka_table.columns]
         if len(genus_ids) < 2:
@@ -169,9 +186,10 @@ if __name__ == '__main__':
     for g in sil_map:
         if sil_map[g] > 0.85:
             good_ones += 1
+            print("GOOD:", g)
         if sil_map[g] == -1:
             failures += 1
 
     print("Failures: ", failures)
     print("Good Ones: ", good_ones)
-    print("Total Ones: ", all_genera)
+    print("Total Ones: ", len(all_genera))
